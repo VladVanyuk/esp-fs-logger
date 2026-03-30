@@ -1,0 +1,91 @@
+name: Platformio-build
+on: pull_request
+
+env:
+  TARGET: esp07s_release_4_2_2 # Must match the value after colon in platformio.ini (line 4: [env:nodemcuv2])
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Check file existence
+      id: check_files
+      uses: andstor/file-existence-action@v2
+      with:
+        files: "data"
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: Install PlatformIO
+      run: pip install --upgrade platformio
+
+    - name: Compile Firmware
+      run: pio run -e ${{ env.TARGET }}
+    - name: Upload Firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: .pio/build/${{ env.TARGET }}/firmware.bin
+
+    - name: Compile Filesystem
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: pio run --target buildfs
+    - name: Rename Filesystem file
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: mv .pio/build/${{ env.TARGET }}/*fs.bin .pio/build/${{ env.TARGET }}/filesystem.bin
+    - name: Upload Filesystem
+      if: steps.check_files.outputs.files_exists == 'true'
+      uses: actions/upload-artifact@v4
+      with: 
+        name: filesystem
+        path: .pio/build/${{ env.TARGET }}/filesystem.bin
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download Firmware Files
+      uses: actions/download-artifact@v3
+
+    - name: Release Firmware
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: ./*/firmware.bin
+        generateReleaseNotes: true
+        allowUpdates: true
+
+    - name: Release Filesystem
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: ./*/filesystem.bin
+        generateReleaseNotes: true
+        allowUpdates: true
+
+# name: PlatformIO-build
+
+# on: push
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
+#       - name: PlatformIO Run
+#         uses: karniv00l/platformio-run-action@v1
+#         with:
+#           environments: "esp07s_release_4_2_1,esp07s_release_4_2_2"
+#           targets: "esp07s_release_4_2_1,esp07s_release_4_2_2"
+#           project-dir: "."
+#           project-conf: "platformio.ini"
+#           jobs: 6
+#           silent: false
+#           verbose: true
+#           disable-auto-clean: false

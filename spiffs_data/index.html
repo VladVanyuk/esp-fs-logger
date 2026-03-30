@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HCLogs</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <aside class="panel sidebar">
+      <div class="brand-block">
+        <p class="eyebrow">ESP32-S3 UART Logger</p>
+        <h1>HCLogs</h1>
+        <p class="muted">LittleFS-backed logs with a built-in review page.</p>
+      </div>
+
+      <section class="status-card">
+        <div class="status-row">
+          <span>SoftAP</span>
+          <strong id="ap-ssid">Waiting</strong>
+        </div>
+        <div class="status-row">
+          <span>Address</span>
+          <strong id="ap-ip">-</strong>
+        </div>
+        <div class="status-row">
+          <span>UART</span>
+          <strong id="uart-summary">-</strong>
+        </div>
+        <div class="status-row">
+          <span>Storage</span>
+          <strong id="storage-summary">-</strong>
+        </div>
+      </section>
+
+      <section class="action-card">
+        <label class="field-label" for="folder-path">Log folder</label>
+        <input id="folder-path" type="text" value="/logs/csv" spellcheck="false">
+
+        <div class="button-grid">
+          <button id="refresh-btn" type="button">Refresh</button>
+          <button id="download-btn" type="button">Download</button>
+          <button id="save-btn" type="button">Save edit</button>
+          <button id="delete-btn" type="button" class="danger">Delete file</button>
+        </div>
+
+        <button id="delete-all-btn" type="button" class="outline danger-wide">Delete all logs</button>
+      </section>
+
+      <section class="file-card">
+        <div class="card-header">
+          <h2>Files</h2>
+          <span id="file-count">0</span>
+        </div>
+        <ul id="file-list" class="file-list"></ul>
+      </section>
+    </aside>
+
+    <main class="panel main-panel">
+      <section class="hero-card">
+        <div>
+          <p class="eyebrow">Current selection</p>
+          <h2 id="current-file">No file selected</h2>
+        </div>
+        <div id="message" class="message info">Waiting for a log file.</div>
+      </section>
+
+      <section class="chart-card">
+        <div class="card-header">
+          <h2>Signal preview</h2>
+          <span id="chart-note">Up to four numeric columns</span>
+        </div>
+        <canvas id="chart" width="960" height="320"></canvas>
+        <div id="legend" class="legend"></div>
+      </section>
+
+      <section class="table-card">
+        <div class="card-header">
+          <h2>Log table</h2>
+          <span id="table-note">Editable cells can be saved back to the selected log file.</span>
+        </div>
+        <div id="table-wrap" class="table-wrap"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/assets/app.js"></script>
+</body>
+</html>
