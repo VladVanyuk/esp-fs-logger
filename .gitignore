@@ -24,3 +24,4 @@ lib/async-esp-fs-webserver.pio-ci
 data/assets/**/*.pdf
 logs/*.log
 logs/**/*.log
+logs/
